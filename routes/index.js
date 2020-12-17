@@ -1,13 +1,10 @@
-const router = require('express').Router();
+const routes = require('express').Router();
 
-const getUsers = require('./users');
-const getCards = require('./cards');
+routes.use('/cards', require('./cards'));
+routes.use('/users', require('./users'));
 
-router.use('/users', getUsers);
-router.use('/cards', getCards);
-
-router.all('/*', (req, res) => {
+routes.all('/*', (req, res) => {
   res.status(404).json({ message: 'Запрашиваемый ресурс не найден' });
 });
 
-module.exports = router;
+module.exports = routes;
