@@ -2,12 +2,11 @@ const Card = require('../models/card');
 
 module.exports.deleteCardById = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
-    .orFail(() => new Error(`Карточка с id: ${req.params.cardId} отсутствует`))
     .then((card) => {
       if (!card) return res.status(404).send({ message: `Карточка с id: ${req.params.cardId} отсутствует` });
       res.status(200).json({ data: card });
     })
-    .catch(() => res.status(404).json({ message: `Карточка с id: ${req.params.cardId} отсутствует` }));
+    .catch((err) => res.status(500).json({ message: err.message }));
 };
 
 module.exports.getCards = (req, res) => {
@@ -34,12 +33,11 @@ module.exports.likeCard = (req, res) => {
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
-    .orFail(() => new Error(`Карточка с id: ${req.params.cardId} отсутствует`))
     .then((card) => {
       if (!card) return res.status(404).send({ message: `Карточка с id: ${req.params.cardId} отсутствует` });
       res.status(200).json({ data: card });
     })
-    .catch(() => res.status(404).json({ message: `Карточка с id: ${req.params.cardId} отсутствует` }));
+    .catch((err) => res.status(500).json({ message: err.message }));
 };
 
 module.exports.unlikeCard = (req, res) => {
@@ -53,5 +51,5 @@ module.exports.unlikeCard = (req, res) => {
       if (!card) return res.status(404).send({ message: `Карточка с id: ${req.params.cardId} отсутствует` });
       res.status(200).json({ data: card });
     })
-    .catch(() => res.status(404).json({ message: `Карточка с id: ${req.params.cardId} отсутствует` }));
+    .catch((err) => res.status(500).json({ message: err.message }));
 };
