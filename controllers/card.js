@@ -3,14 +3,17 @@ const Card = require('../models/card');
 module.exports.deleteCardById = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
     .orFail(() => new Error(`Карточка с id: ${req.params.cardId} отсутствует`))
-    .then((card) => res.status(200).json({ data: card }))
-    .catch((err) => res.status(400).json({ message: err.message }));
+    .then((card) => {
+      if (!card) return res.status(404).send({ message: `Карточка с id: ${req.params.cardId} отсутствует` });
+      res.status(200).json({ data: card });
+    })
+    .catch(() => res.status(404).json({ message: `Карточка с id: ${req.params.cardId} отсутствует` }));
 };
 
 module.exports.getCards = (req, res) => {
   Card.find({})
     .then((cards) => res.status(200).json({ data: cards }))
-    .catch(() => res.status(500).json({ message: 'Произошла ошибка' }));
+    .catch(() => res.status(500).json({ message: 'Произошла ошибка на сервере' }));
 };
 
 module.exports.createCard = (req, res) => {
@@ -32,8 +35,11 @@ module.exports.likeCard = (req, res) => {
     { new: true },
   )
     .orFail(() => new Error(`Карточка с id: ${req.params.cardId} отсутствует`))
-    .then((card) => res.send({ data: card }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .then((card) => {
+      if (!card) return res.status(404).send({ message: `Карточка с id: ${req.params.cardId} отсутствует` });
+      res.status(200).json({ data: card });
+    })
+    .catch(() => res.status(404).json({ message: `Карточка с id: ${req.params.cardId} отсутствует` }));
 };
 
 module.exports.unlikeCard = (req, res) => {
@@ -43,6 +49,9 @@ module.exports.unlikeCard = (req, res) => {
     { new: true },
   )
     .orFail(() => new Error(`Карточка с id: ${req.params.cardId} отсутствует`))
-    .then((card) => res.send({ data: card }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .then((card) => {
+      if (!card) return res.status(404).send({ message: `Карточка с id: ${req.params.cardId} отсутствует` });
+      res.status(200).json({ data: card });
+    })
+    .catch(() => res.status(404).json({ message: `Карточка с id: ${req.params.cardId} отсутствует` }));
 };
