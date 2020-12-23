@@ -56,7 +56,6 @@ module.exports.unlikeCard = (req, res) => {
       { $pull: { likes: req.user._id } }, // убрать _id из массива
       { new: true },
     )
-      .orFail(() => new Error(`Карточка с id: ${req.params.cardId} отсутствует`))
       .then((card) => {
         if (!card) return res.status(404).send({ message: `Карточка с id: ${req.params.cardId} отсутствует` });
         res.status(200).json({ data: card });
