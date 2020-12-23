@@ -1,12 +1,17 @@
+const mongoose = require('mongoose');
 const User = require('../models/user');
 
 module.exports.getUserById = (req, res) => {
-  User.findById(req.params.id)
-    .then((user) => {
-      if (!user) return res.status(404).send({ message: `Пользователь c id: ${req.params.id} не найден` });
-      res.status(200).json({ data: user });
-    })
-    .catch((err) => res.status(500).json({ message: err.message }));
+  if (mongoose.Types.ObjectId.isValid(req.params.id)) {
+    User.findById(req.params.id)
+      .then((user) => {
+        if (!user) return res.status(404).send({ message: `Пользователь c id: ${req.params.id} не найден` });
+        res.status(200).json({ data: user });
+      })
+      .catch((err) => res.status(500).json({ message: err.message }));
+  } else {
+    res.status(400).json({ message: 'Переданы некорректные данные' });
+  }
 };
 
 module.exports.getUsers = (req, res) => {

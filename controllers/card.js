@@ -1,12 +1,17 @@
+const mongoose = require('mongoose');
 const Card = require('../models/card');
 
 module.exports.deleteCardById = (req, res) => {
-  Card.findByIdAndRemove(req.params.cardId)
-    .then((card) => {
-      if (!card) return res.status(404).send({ message: `Карточка с id: ${req.params.cardId} отсутствует` });
-      res.status(200).json({ data: card });
-    })
-    .catch((err) => res.status(500).json({ message: err.message }));
+  if (mongoose.Types.ObjectId.isValid(req.params.cardId)) {
+    Card.findByIdAndRemove(req.params.cardId)
+      .then((card) => {
+        if (!card) return res.status(404).send({ message: `Карточка с id: ${req.params.cardId} отсутствует` });
+        res.status(200).json({ data: card });
+      })
+      .catch((err) => res.status(500).json({ message: err.message }));
+  } else {
+    res.status(400).json({ message: 'Переданы некорректные данные' });
+  }
 };
 
 module.exports.getCards = (req, res) => {
@@ -28,28 +33,36 @@ module.exports.createCard = (req, res) => {
 };
 
 module.exports.likeCard = (req, res) => {
-  Card.findByIdAndUpdate(
-    req.params.cardId,
-    { $addToSet: { likes: req.user._id } },
-    { new: true },
-  )
-    .then((card) => {
-      if (!card) return res.status(404).send({ message: `Карточка с id: ${req.params.cardId} отсутствует` });
-      res.status(200).json({ data: card });
-    })
-    .catch((err) => res.status(500).json({ message: err.message }));
+  if (mongoose.Types.ObjectId.isValid(req.params.cardId)) {
+    Card.findByIdAndUpdate(
+      req.params.cardId,
+      { $addToSet: { likes: req.user._id } },
+      { new: true },
+    )
+      .then((card) => {
+        if (!card) return res.status(404).send({ message: `Карточка с id: ${req.params.cardId} отсутствует` });
+        res.status(200).json({ data: card });
+      })
+      .catch((err) => res.status(500).json({ message: err.message }));
+  } else {
+    res.status(400).json({ message: 'Переданы некорректные данные' });
+  }
 };
 
 module.exports.unlikeCard = (req, res) => {
-  Card.findByIdAndUpdate(
-    req.params.cardId,
-    { $pull: { likes: req.user._id } }, // убрать _id из массива
-    { new: true },
-  )
-    .orFail(() => new Error(`Карточка с id: ${req.params.cardId} отсутствует`))
-    .then((card) => {
-      if (!card) return res.status(404).send({ message: `Карточка с id: ${req.params.cardId} отсутствует` });
-      res.status(200).json({ data: card });
-    })
-    .catch((err) => res.status(500).json({ message: err.message }));
+  if (mongoose.Types.ObjectId.isValid(req.params.cardId)) {
+    Card.findByIdAndUpdate(
+      req.params.cardId,
+      { $pull: { likes: req.user._id } }, // убрать _id из массива
+      { new: true },
+    )
+      .orFail(() => new Error(`Карточка с id: ${req.params.cardId} отсутствует`))
+      .then((card) => {
+        if (!card) return res.status(404).send({ message: `Карточка с id: ${req.params.cardId} отсутствует` });
+        res.status(200).json({ data: card });
+      })
+      .catch((err) => res.status(500).json({ message: err.message }));
+  } else {
+    res.status(400).json({ message: 'Переданы некорректные данные' });
+  }
 };
